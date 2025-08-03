@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from "react";
 
+function randomInt() {
+  const posNeg = Math.sign(Math.random()-0.5);
+  return Math.floor(Math.random() * (99 - 0 + 1) + 0) * posNeg;
+}
 export default function Home() {
-  const [numArr, setNumbers] = useState<number[]>([1, 2, 3])
+  const [numArr, setNumbers] = useState<number[]>([randomInt(), randomInt(), randomInt()])
   const [inpElems, setInpElems] = useState<JSX.Element[]>([])
 
   useEffect(() => {
@@ -16,7 +20,7 @@ export default function Home() {
   }, [numArr])
   
   const onClickIncrement = () => {
-    setNumbers([...numArr, 1])
+    setNumbers([...numArr, randomInt()])
   }
 
   const onClickDecrement = () => {
