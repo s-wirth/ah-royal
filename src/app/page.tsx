@@ -2,6 +2,9 @@
 import styles from "./page.module.css";
 import { useEffect, useState } from "react";
 
+function arrToString(arr: number[]) {
+  return "[" + arr.join(", ") + "]";
+}
 function randomInt() {
   const posNeg = Math.sign(Math.random()-0.5);
   const ranNum = Math.floor(Math.random() * (10 - 0 + 1) + 0) * posNeg;
@@ -23,16 +26,17 @@ function arraySum(arr: number[]) {
 }
 
 function negCardRed(pp, negCardArr) {
-  if(!negCardArr || negCardArr.length === 0){
-    return;
+  if(!negCardArr || negCardArr.length === 0 || pp === 0) {
+    return [];
   }
   console.log('negCardArr', negCardArr)
   const cardSum = arraySum(negCardArr)
-  if (pp - cardSum <= 0) {
+  console.log('pp', pp, 'cardSum', cardSum)
+  if (pp + cardSum >= 0) {
     return negCardArr;
-  } else (
-    negCardRed(pp, negCardArr.slice(1))
-  )
+  } else if (negCardArr.length > 0) {
+    return negCardRed(pp, negCardArr.slice(1))
+  }
 }
 function pickCards(cardsArr: number[]) {
   if (cardsArr.length === 0) {
@@ -60,24 +64,27 @@ function pickCards(cardsArr: number[]) {
       playerPower += arraySum(cA)
     }
     if(cA[0] < 0 && playerPower > 0) {
+      console.log('cA in splitcards', cA)
       const reducedNegativeArr = negCardRed(playerPower, cA);
-      console.log('reducedNegativeArr', reducedNegativeArr)
+      playerPower += arraySum(reducedNegativeArr);
       pickedCards.push(...reducedNegativeArr);
     }
   })
-  console.log('pickedCards', pickedCards)
-  console.log('playerPower', playerPower)
-  console.log('splitCards', splitCards)
+  const response = {
+    pickedCards: pickedCards,
+    playerPower: playerPower
+  }
+  return response;
 }
 export default function Home() {
-  const [numArr, setNumbers] = useState<number[]>([randomInt(), randomInt(), randomInt()])
+  const [numArr, setNumbers] = useState<number[]>([4, 2, -4, 5, -9, -2, -1])
   const [inpElems, setInpElems] = useState<JSX.Element[]>([])
   const [arrStr, setArrStr] = useState<string>("")
 
   useEffect(() => {
     const iE = numArr.map((elem, index) => {
     return (
-      <input className={styles.inp} type="number" key={index} value={elem} onChange={(value) => {numArr[index] = value}} />
+      <input className={styles.inp} type="number" id={index} key={index} value={elem} onChange={(value) => {setNumbers([...numArr.slice(0, index), Number(value.target.value), ...numArr.slice(index + 1)])}} />
     )})
     setInpElems(iE)
     setArrStr("[" + numArr.join(", ") + "]")
@@ -92,14 +99,20 @@ export default function Home() {
   }
   return (
     <div>
+      <div>
+        <h1>Input</h1>
+        <div>Add Number <button onClick={onClickIncrement}>+</button></div>
+        
+        <div>Remove Number <button onClick={onClickDecrement}>-</button></div>
+        <div>{inpElems}</div>
+        </div>
       <p>Array: {arrStr}</p>
       <p>Array Size: {numArr.length}</p>
-      <div>Add Number <button onClick={onClickIncrement}>+</button></div>
-      
-      <div>Remove Number <button onClick={onClickDecrement}>-</button></div>
-      {inpElems}
       <div>
-        <p>Max Cards you can pick up: {pickCards(numArr)}</p>
+        <h1>Output:</h1>
+        <p>Player Power: {pickCards(numArr).playerPower}</p>
+        <p>Max amount of cards you can pick: {pickCards(numArr).pickedCards.length}</p>
+        <p>Picked cards: {arrToString(pickCards(numArr).pickedCards)}</p>
       </div>
     </div>
   );
