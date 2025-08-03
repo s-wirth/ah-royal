@@ -1,5 +1,5 @@
 'use client'
-
+import styles from "./page.module.css";
 import { useEffect, useState } from "react";
 
 function randomInt() {
@@ -9,14 +9,16 @@ function randomInt() {
 export default function Home() {
   const [numArr, setNumbers] = useState<number[]>([randomInt(), randomInt(), randomInt()])
   const [inpElems, setInpElems] = useState<JSX.Element[]>([])
+  const [arrStr, setArrStr] = useState<string>("")
 
   useEffect(() => {
     console.log(numArr)
     const iE = numArr.map((elem, index) => {
     return (
-      <input type="number" key={index} value={elem} onChange={(value) => {numArr[index] = value}} />
+      <input className={styles.inp} type="number" key={index} value={elem} onChange={(value) => {numArr[index] = value}} />
     )})
     setInpElems(iE)
+    setArrStr("[" + numArr.join(", ") + "]")
   }, [numArr])
   
   const onClickIncrement = () => {
@@ -28,9 +30,12 @@ export default function Home() {
   }
   return (
     <div>
-      Array Size
-      <button onClick={onClickIncrement}>+</button>
-      <button onClick={onClickDecrement}>-</button>
+      <p>Array: {arrStr}</p>
+      <p>Array Size: {numArr.length}</p>
+      <div>Add Number <button onClick={onClickIncrement}>+</button></div>
+      
+      <div>Remove Number <button onClick={onClickDecrement}>-</button></div>
+      
       {inpElems}
     </div>
   );
